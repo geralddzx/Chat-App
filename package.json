@@ -1,0 +1,10 @@
+{
+  "name": "chat-app",
+  "description": "W8D2 chat app",
+  "version": "0.0.1",
+  "dependencies": {
+    "node-static": "^0.7.4",
+    "socket.io": "1.0.x",
+    "mime": "1.2.7"
+  }
+}

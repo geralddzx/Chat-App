@@ -1,0 +1,58 @@
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+  <ul id="messageBox"></ul>
+  <form>
+    
+    <textarea id="Cbox"></textarea>
+    <input type="submit">
+  </form>
+  <h4 id="roomHeader"></h4>
+  <ul id="userBox"></ul>
+  <script> 
+  var socket = io("http://localhost");
+  socket.on('display_chat', function(data){
+    var newMessage = $("<li>").html(data.nick+": "+data.message)
+    $("#messageBox").append(newMessage);
+  });
+  
+  socket.on('roomUserUpdate', function(data){
+    $("#roomHeader").html(data.room);
+    $("#userBox").html("");
+    data.users.forEach( function(user){
+      $("#userBox").append($("<li>").html(user));
+    })
+  })
+  
+  socket.on('nicknameChangeResult', function(data){
+    var newMessage = $("<li>").html(data.message)
+    $("#messageBox").append(newMessage);
+  })
+  
+  $(document).ready(function () {
+    var nick = "pineapple";
+    
+    $('form').on('submit', function (event) {
+      event.preventDefault();
+      var message = $("#Cbox").val();
+      var command = message.slice(0, 5)
+      
+      if (command === "/nick"){
+        var nickname = message.slice(5)
+        socket.emit("nicknameChangeRequest", {nick: nickname})
+      } else if (command === "/join"){
+        var roomName = message.slice(5)
+        socket.emit("join_room", {room: roomName})
+      } else {
+        socket.emit('send_chat', {message: message});
+      }
+      $("#Cbox").val('');
+    });
+  }); 
+  </script>
+</body>
+</html>
